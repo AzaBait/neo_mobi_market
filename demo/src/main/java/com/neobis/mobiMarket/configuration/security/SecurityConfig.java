@@ -1,5 +1,6 @@
 package com.neobis.mobiMarket.configuration.security;
 
+import com.neobis.mobiMarket.configuration.security.jwt.JwtTokenFilter;
 import com.neobis.mobiMarket.service.impl.UserServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +15,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.Arrays;
@@ -24,8 +26,9 @@ import java.util.Collections;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final   UserServiceImpl userService;
+    private final UserServiceImpl userService;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtTokenFilter jwtTokenFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -53,6 +56,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/product/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/product/save").permitAll()
                 )
+                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }
