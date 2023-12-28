@@ -2,6 +2,7 @@ package com.neobis.mobiMarket.service;
 
 import com.neobis.mobiMarket.dto.ProductDto;
 import com.neobis.mobiMarket.entity.Product;
+import com.neobis.mobiMarket.entity.User;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -16,4 +17,5 @@ public interface ProductService {
     ResponseEntity<Product> update (Long id, ProductDto product);
     ResponseEntity<String> deleteProduct(Long id);
     List<Product> getAllProducts();
+    void likeProduct(Long productId, User currentUser);
 }

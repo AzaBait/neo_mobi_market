@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -43,10 +44,10 @@ public class User implements UserDetails {
     private Set<Role> roles;
     @ManyToMany(mappedBy = "likedBy", cascade = {CascadeType.DETACH,
             CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    private List<Product> likes;
+    private List<Product> likes = new ArrayList<>();
     @ManyToMany(mappedBy = "favoriteBy", cascade = {CascadeType.DETACH,
             CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    private List<Product> favorites;
+    private List<Product> favorites = new ArrayList<>();
 
     public User(String username, String firstName, String lastName, String email,
                 String phone, String profileImage, String password, Boolean enabled,

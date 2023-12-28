@@ -2,10 +2,12 @@ package com.neobis.mobiMarket.controller;
 
 import com.neobis.mobiMarket.dto.ProductDto;
 import com.neobis.mobiMarket.entity.Product;
+import com.neobis.mobiMarket.entity.User;
 import com.neobis.mobiMarket.mapper.ProductMapper;
 import com.neobis.mobiMarket.service.ProductService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import net.bytebuddy.asm.MemberSubstitution;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,10 +28,10 @@ public class ProductController {
         ProductDto savedProductDto = productMapper.entityToDto(product);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedProductDto);
     }
-    @GetMapping("/{id}")
-    public ResponseEntity<List<ProductDto>> getProductsByUserId(@PathVariable Long id) {
+    @GetMapping("user/{userId}")
+    public ResponseEntity<List<ProductDto>> getProductsByUserId(@PathVariable Long userId) {
        try {
-           List<Product> products = productService.getAllByUserId(id);
+           List<Product> products = productService.getAllByUserId(userId);
 
         if (!products.isEmpty()) {
             List<ProductDto> productDtos = ProductMapper.INSTANCE.entitiesToDtos(products);
@@ -51,6 +53,11 @@ public class ProductController {
             return ResponseEntity.notFound().build();
         }
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductDto> getById(@PathVariable Long id) {
+        return productService.getById(id).map(product -> ResponseEntity.ok(productMapper.entityToDto(product)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
     @GetMapping("/list")
     public ResponseEntity<List<ProductDto>> getAll() {
         List<ProductDto> productDtos = productMapper.entitiesToDtos(productService.getAllProducts());
@@ -59,6 +66,11 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProductById(@PathVariable Long id) {
         return productService.deleteProduct(id);
+    }
+    @PostMapping("/{productId}/like")
+    public ResponseEntity<String> likeProduct(@PathVariable Long productId, @MemberSubstitution.Current User currentuser) {
+        productService.likeProduct(productId, currentuser);
+        return ResponseEntity.ok("Product liked successfully!");
     }
 
 

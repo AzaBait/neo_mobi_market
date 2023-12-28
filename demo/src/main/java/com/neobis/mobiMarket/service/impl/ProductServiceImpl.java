@@ -2,7 +2,9 @@ package com.neobis.mobiMarket.service.impl;
 
 import com.neobis.mobiMarket.dto.ProductDto;
 import com.neobis.mobiMarket.entity.Product;
+import com.neobis.mobiMarket.entity.User;
 import com.neobis.mobiMarket.repository.ProductRepo;
+import com.neobis.mobiMarket.repository.UserRepo;
 import com.neobis.mobiMarket.service.ProductService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,8 @@ import java.util.Optional;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepo productRepo;
+    private final UserRepo userRepo;
+
     @Override
     public Optional<Product> findByName(String name) {
         Product product = productRepo.findByName(name).orElseThrow(()
@@ -83,5 +87,18 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public List<Product> getAllProducts() {
         return productRepo.findAll();
+    }
+
+    @Override
+    public void likeProduct(Long productId, User currentUser) {
+        Product product = productRepo.findById(productId)
+                .orElseThrow(() -> new EntityNotFoundException("Product not found with id: " + productId));
+        currentUser.getLikes().add(product);
+        if (!currentUser.getFavorites().contains(product)) {
+            currentUser.getFavorites().add(product);
+            product.getFavoriteBy().add(currentUser);
+        }
+        userRepo.save(currentUser);
+        productRepo.save(product);
     }
 }
