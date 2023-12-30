@@ -5,12 +5,17 @@ import com.neobis.mobiMarket.entity.Product;
 import com.neobis.mobiMarket.entity.User;
 import com.neobis.mobiMarket.repository.ProductRepo;
 import com.neobis.mobiMarket.repository.UserRepo;
+import com.neobis.mobiMarket.service.CloudinaryService;
 import com.neobis.mobiMarket.service.ProductService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 @Service
@@ -19,6 +24,7 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepo productRepo;
     private final UserRepo userRepo;
+    private final CloudinaryService cloudinaryService;
 
     @Override
     public Optional<Product> findByName(String name) {
@@ -65,7 +71,7 @@ public class ProductServiceImpl implements ProductService {
             productInDB.setShortDescription(product.getShortDescription());
             productInDB.setDetailedDescription(product.getDetailedDescription());
             productInDB.setPrice(product.getPrice());
-            productInDB.setImage(product.getImage());
+            productInDB.setImages(product.getImages());
 
 
             productRepo.save(productInDB);

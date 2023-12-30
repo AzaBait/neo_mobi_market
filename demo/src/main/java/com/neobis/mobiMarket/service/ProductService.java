@@ -4,7 +4,9 @@ import com.neobis.mobiMarket.dto.ProductDto;
 import com.neobis.mobiMarket.entity.Product;
 import com.neobis.mobiMarket.entity.User;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 

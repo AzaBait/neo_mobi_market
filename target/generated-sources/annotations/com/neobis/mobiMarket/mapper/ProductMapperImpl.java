@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-12-21T20:23:25+0600",
+    date = "2023-12-29T21:49:02+0600",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 18.0.1.1 (Oracle Corporation)"
 )
 @Component
@@ -26,16 +26,19 @@ public class ProductMapperImpl implements ProductMapper {
         String shortDescription = null;
         String detailedDescription = null;
         double price = 0.0d;
-        String image = null;
+        List<String> images = null;
 
         id = product.getId();
         name = product.getName();
         shortDescription = product.getShortDescription();
         detailedDescription = product.getDetailedDescription();
         price = product.getPrice();
-        image = product.getImage();
+        List<String> list = product.getImages();
+        if ( list != null ) {
+            images = new ArrayList<String>( list );
+        }
 
-        ProductDto productDto = new ProductDto( id, name, shortDescription, detailedDescription, price, image );
+        ProductDto productDto = new ProductDto( id, name, shortDescription, detailedDescription, price, images );
 
         return productDto;
     }
@@ -53,7 +56,10 @@ public class ProductMapperImpl implements ProductMapper {
         product.setShortDescription( productDto.getShortDescription() );
         product.setDetailedDescription( productDto.getDetailedDescription() );
         product.setPrice( productDto.getPrice() );
-        product.setImage( productDto.getImage() );
+        List<String> list = productDto.getImages();
+        if ( list != null ) {
+            product.setImages( new ArrayList<String>( list ) );
+        }
 
         return product;
     }

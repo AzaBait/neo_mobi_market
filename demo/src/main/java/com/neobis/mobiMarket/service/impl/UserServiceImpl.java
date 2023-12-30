@@ -1,9 +1,11 @@
 package com.neobis.mobiMarket.service.impl;
 
 import com.neobis.mobiMarket.dto.UserDto;
+import com.neobis.mobiMarket.entity.Product;
 import com.neobis.mobiMarket.entity.Role;
 import com.neobis.mobiMarket.entity.User;
 import com.neobis.mobiMarket.exception.EmailNotFoundException;
+import com.neobis.mobiMarket.exception.UserNotFoundException;
 import com.neobis.mobiMarket.repository.UserRepo;
 import com.neobis.mobiMarket.service.RoleService;
 import com.neobis.mobiMarket.service.UserService;
@@ -109,6 +111,19 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public ResponseEntity<String> deleteUser(Long id) {
         return null;
+    }
+
+    @Override
+    public List<Product> getFavoriteProducts(Long userId) {
+        Optional<User> userOptional = userRepo.findById(userId);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            List<Product> favoriteProducts = user.getFavorites();
+            return ResponseEntity.ok(favoriteProducts).getBody();
+        }else {
+            throw new UserNotFoundException("User not found with id: " + userId);
+        }
+
     }
 
     @Override

@@ -21,7 +21,10 @@ public class Product {
     private String shortDescription;
     private String detailedDescription;
     private double price;
-    private String image;
+    @ElementCollection
+    @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "image")
+    private List<String> images;
     @ManyToOne
  //   @JoinColumn(name = "user_id")
     private User user;
@@ -48,7 +51,8 @@ public class Product {
                 ", shortDescription='" + shortDescription + '\'' +
                 ", detailedDescription='" + detailedDescription + '\'' +
                 ", price=" + price +
-                ", image='" + image + '\'' +
+                ", images=" + images +
+                ", user=" + user +
                 ", likedBy=" + likedBy +
                 ", favoriteBy=" + favoriteBy +
                 '}';
