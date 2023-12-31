@@ -19,7 +19,7 @@ public class ImageUploadController {
     public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
         try {
             String imageUrl = cloudinaryService.uploadImage(file);
-            return ResponseEntity.ok("Your photo successfully uploaded!");
+            return ResponseEntity.ok("Your photo uploaded successfully! " + imageUrl);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error while uploading your photo!");
         }

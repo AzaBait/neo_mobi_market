@@ -54,7 +54,7 @@ public class SecurityConfig {
                                 "api/product/**").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/product/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/api/product/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/product/save").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/product/save").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/product/*/like").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/image/uploadImage").permitAll()
                 )

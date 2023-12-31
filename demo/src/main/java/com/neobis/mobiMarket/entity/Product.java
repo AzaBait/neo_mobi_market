@@ -3,6 +3,7 @@ package com.neobis.mobiMarket.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -24,7 +25,7 @@ public class Product {
     @ElementCollection
     @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
     @Column(name = "image")
-    private List<String> images;
+    private List<String> images = new ArrayList<>();
     @ManyToOne
  //   @JoinColumn(name = "user_id")
     private User user;

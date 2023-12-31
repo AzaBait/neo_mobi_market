@@ -4,10 +4,13 @@ import com.neobis.mobiMarket.dto.ProductDto;
 import com.neobis.mobiMarket.entity.Product;
 import com.neobis.mobiMarket.entity.User;
 import com.neobis.mobiMarket.mapper.ProductMapper;
+import com.neobis.mobiMarket.service.CloudinaryService;
 import com.neobis.mobiMarket.service.ProductService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import net.bytebuddy.asm.MemberSubstitution;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,13 +28,36 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+    private CloudinaryService cloudinaryService;
     private final ProductMapper productMapper;
+    private final Logger logger = LoggerFactory.getLogger(ProductController.class);
+//    @PostMapping("/save")
+//    public ResponseEntity<ProductDto> saveProduct(@RequestBody ProductDto productDto) {
+//        Product product = productService.save(productMapper.dtoToEntity(productDto)).getBody();
+//        ProductDto savedProductDto = productMapper.entityToDto(product);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(savedProductDto);
+//    }
+
     @PostMapping("/save")
-    public ResponseEntity<ProductDto> saveProduct(@RequestBody ProductDto productDto) {
-        Product product = productService.save(productMapper.dtoToEntity(productDto)).getBody();
-        ProductDto savedProductDto = productMapper.entityToDto(product);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedProductDto);
-    }
+    public ResponseEntity<ProductDto> saveProduct(@ModelAttribute ProductDto productDto,
+                                                  @RequestParam ("file")List<MultipartFile> file) {
+        try {
+            // Создание продукта с полученными данными и URL изображений
+            Product product = productMapper.dtoToEntity(productDto);
+
+            // Сохранение продукта
+            ResponseEntity<Product> savedProductResponse = productService.save(product, file);
+            Product savedProduct = savedProductResponse.getBody();
+
+            // Преобразование и возврат сохраненного продукта
+            ProductDto savedProductDto = productMapper.entityToDto(savedProduct);
+            return ResponseEntity.status(savedProductResponse.getStatusCode()).body(savedProductDto);
+        } catch (Exception e) {
+            logger.error("Error while saving product with images", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .build();
+        }}
+
     @GetMapping("user/{userId}")
     public ResponseEntity<List<ProductDto>> getProductsByUserId(@PathVariable Long userId) {
        try {
