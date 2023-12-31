@@ -42,14 +42,9 @@ public class ProductController {
     public ResponseEntity<ProductDto> saveProduct(@ModelAttribute ProductDto productDto,
                                                   @RequestParam ("file")List<MultipartFile> file) {
         try {
-            // Создание продукта с полученными данными и URL изображений
             Product product = productMapper.dtoToEntity(productDto);
-
-            // Сохранение продукта
             ResponseEntity<Product> savedProductResponse = productService.save(product, file);
             Product savedProduct = savedProductResponse.getBody();
-
-            // Преобразование и возврат сохраненного продукта
             ProductDto savedProductDto = productMapper.entityToDto(savedProduct);
             return ResponseEntity.status(savedProductResponse.getStatusCode()).body(savedProductDto);
         } catch (Exception e) {
