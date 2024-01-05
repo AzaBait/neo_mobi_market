@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ImageUploadController {
 
     private final CloudinaryService cloudinaryService;
+
     @PostMapping("/uploadImage")
     public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
         try {

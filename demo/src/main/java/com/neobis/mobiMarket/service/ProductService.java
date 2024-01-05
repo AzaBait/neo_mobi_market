@@ -12,13 +12,23 @@ import java.util.Optional;
 public interface ProductService {
 
     Optional<Product> findByName(String name);
+
     List<Product> getAllByUserId(Long id);
- //   ResponseEntity<Product> save(Product product);
+
+    List<String> getProductImagePublicIds(Long productId);
+
+    //   ResponseEntity<Product> save(Product product);
     Optional<Product> getById(Long id);
-    ResponseEntity<Product> update (Long id, ProductDto product);
+
+    ResponseEntity<Product> update(Long id, ProductDto product);
+
     ResponseEntity<String> deleteProduct(Long id);
+
     List<Product> getAllProducts();
+
     void likeProduct(Long productId, User currentUser);
 
     ResponseEntity<Product> save(Product product, List<MultipartFile> imageFiles);
+
+    ResponseEntity<Product> deleteProductImage(Long productId, String imageUrl);
 }

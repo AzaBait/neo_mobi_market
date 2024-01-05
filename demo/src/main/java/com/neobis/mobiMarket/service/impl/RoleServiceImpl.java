@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import javax.management.relation.RoleNotFoundException;
 import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class RoleServiceImpl implements RoleService {

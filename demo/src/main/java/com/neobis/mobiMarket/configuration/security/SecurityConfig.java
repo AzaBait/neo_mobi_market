@@ -52,11 +52,13 @@ public class SecurityConfig {
                                 "/error").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/product/list",
                                 "api/product/**").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "api/user/*").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/product/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/api/product/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/product/save").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/product/*/like").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/image/uploadImage").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "api/product/*/image/*").authenticated()
                 )
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -70,8 +72,21 @@ public class SecurityConfig {
         authenticationProvider.setUserDetailsService(userService);
         return authenticationProvider;
     }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
+//    @Bean
+//    public HttpFirewall getHttpFirewall() {
+//        return new DefaultHttpFirewall();
+//    }
+//@Bean
+//public HttpFirewall getHttpFirewall() {
+//    StrictHttpFirewall strictHttpFirewall = new StrictHttpFirewall();
+//    strictHttpFirewall.setAllowBackSlash(true);
+//    strictHttpFirewall.setAllowUrlEncodedDoubleSlash(true);
+//    strictHttpFirewall.setAllowedHttpMethods(Arrays.asList("GET","POST","DELETE", "OPTIONS"));
+//    return strictHttpFirewall;
+//}
 }

@@ -1,6 +1,7 @@
 package com.neobis.mobiMarket.service.impl;
 
 import com.neobis.mobiMarket.dto.ProductDto;
+import com.neobis.mobiMarket.entity.Image;
 import com.neobis.mobiMarket.entity.Product;
 import com.neobis.mobiMarket.entity.User;
 import com.neobis.mobiMarket.repository.ProductRepo;
@@ -17,7 +18,6 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,6 +25,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -52,39 +54,6 @@ public class ProductServiceImpl implements ProductService {
         return products;
     }
 
-//    @Override
-//    public ResponseEntity<Product> save(Product product) {
-//        Product product1;
-//        try {
-//            product1 = productRepo.save(product);
-//        } catch (Exception e) {
-//            throw new RuntimeException("Could not save product!");
-//        }
-//        return ResponseEntity.ok(product1);
-//    }
-
-//    @Override
-//    public ResponseEntity<Product> save(Product product, List<MultipartFile> imageFiles) {
-//        try {
-//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//            com.neobis.mobiMarket.entity.User user = (com.neobis.mobiMarket.entity.User) authentication.getPrincipal();
-//
-//            product.setUser(user);
-//            // Сохраняем продукт в репозитории
-//            Product savedProduct = productRepo.save(product);
-//
-//            // Загружаем фотографии в облачное хранилище и обновляем продукт с URL изображений
-//            List<String> imageUrls = cloudinaryService.uploadImages(imageFiles);
-//            savedProduct.setImages(imageUrls);
-//
-//            // Возвращаем ResponseEntity с сохраненным продуктом
-//            return ResponseEntity.ok(savedProduct);
-//        } catch (DataAccessException e) {
-//            logger.error("Error saving product to the database", e);
-//            throw new RuntimeException("Could not save product to the database", e);
-//        }
-//    }
-
     @Override
     public ResponseEntity<Product> save(Product product, List<MultipartFile> imageFiles) {
         try {
@@ -93,21 +62,30 @@ public class ProductServiceImpl implements ProductService {
             logger.info("Type of principal in ProductService.save(): " + principal.getClass().getName());
 
             if (principal instanceof UserDetails) {
-
                 UserDetails userDetails = (UserDetails) principal;
                 Optional<User> userOptional = userService.findByUsername(userDetails.getUsername());
 
                 if (userOptional.isPresent()) {
-
                     User user = userOptional.get();
                     product.setUser(user);
+
                     Product savedProduct = productRepo.save(product);
-                    List<String> imageUrls = cloudinaryService.uploadImages(imageFiles);
-                    List<String> updatedImages = new ArrayList<>(savedProduct.getImages());
-                    updatedImages.addAll(imageUrls);
-                    savedProduct.setImages(updatedImages);
+                    List<Image> images = new ArrayList<>();
+
+                    for (MultipartFile file : imageFiles) {
+                        String imageUrl = cloudinaryService.uploadImage(file);
+                        String publicId = cloudinaryService.extractPublicId(imageUrl);
+                        Image productImage = new Image();
+                        productImage.setPublicId(publicId);
+                        productImage.setUrl(imageUrl);
+                        productImage.setProduct(savedProduct);
+                        images.add(productImage);
+                    }
+
+                    savedProduct.setImages(images);
                     productRepo.save(savedProduct);
-                    logger.debug("Updated images: {}", updatedImages);
+
+                    logger.debug("Updated images: {}", images);
                     return ResponseEntity.ok(savedProduct);
                 } else {
                     throw new RuntimeException("User not found for username: " + userDetails.getUsername());
@@ -122,6 +100,49 @@ public class ProductServiceImpl implements ProductService {
             throw new RuntimeException("Could not save product to the database", e);
         }
     }
+
+    @Override
+    public ResponseEntity<Product> deleteProductImage(Long productId, String publicId) {
+        try {
+            Product product = productRepo.findById(productId)
+                    .orElseThrow(() -> new IllegalStateException("Product with id " + productId + " not found!"));
+
+            List<Image> images = product.getImages();
+
+            Optional<Image> imageToRemove = images.stream()
+                    .filter(image -> image.getPublicId().equals(publicId))
+                    .findFirst();
+
+            if (imageToRemove.isPresent()) {
+                String deletedPublicId = imageToRemove.get().getPublicId();
+                cloudinaryService.deleteProductImage(deletedPublicId);
+                images.remove(imageToRemove.get());
+                productRepo.save(product);
+                return ResponseEntity.ok(product);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error deleting product image", e);
+        }
+    }
+
+    @Override
+    public List<String> getProductImagePublicIds(Long productId) {
+        try {
+            Product product = productRepo.findById(productId)
+                    .orElseThrow(() -> new IllegalStateException("Product with id " + productId + " not found!"));
+
+            List<Image> images = product.getImages();
+            return images.stream()
+                    .map(Image::getPublicId)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new RuntimeException("Error getting product image public IDs", e);
+        }
+    }
+
+
     @Override
     public Optional<Product> getById(Long id) {
         Product product = productRepo.findById(id).orElseThrow(()
@@ -140,7 +161,15 @@ public class ProductServiceImpl implements ProductService {
             productInDB.setShortDescription(product.getShortDescription());
             productInDB.setDetailedDescription(product.getDetailedDescription());
             productInDB.setPrice(product.getPrice());
-            productInDB.setImages(product.getImages());
+            List<Image> images = product.getImages().stream()
+                    .map(imageUrl -> {
+                        Image image = new Image();
+                        image.setUrl(imageUrl);
+                        return image;
+                    })
+                    .collect(Collectors.toList());
+
+            productInDB.setImages(images);
 
 
             productRepo.save(productInDB);
@@ -156,7 +185,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepo.findById(id).orElseThrow(() ->
                 new IllegalStateException("Product with id " + id + " does not exist!"));
         productRepo.deleteById(product.getId());
-        return ResponseEntity.ok("Product with id " + id +" successfully deleted!");
+        return ResponseEntity.ok("Product with id " + id + " successfully deleted!");
     }
 
     @Override

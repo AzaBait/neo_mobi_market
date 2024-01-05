@@ -18,13 +18,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JwtTokenUtil jwtTokenUtil;
     private final AuthenticationManager authenticationManager;
     private final UserServiceImpl userService;
+
     @Override
     public String authenticateAndGetToken(JwtRequest jwtRequest) {
         try {
             authenticate(jwtRequest.getUsername(), jwtRequest.getPassword());
             final UserDetails userDetails = userService.loadUserByUsername(jwtRequest.getUsername());
             return jwtTokenUtil.generateToken(userDetails);
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
@@ -33,9 +34,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private void authenticate(String username, String password) throws Exception {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-        }catch (DisabledException e) {
+        } catch (DisabledException e) {
             throw new Exception("User disabled", e);
-        }catch (BadCredentialsException e) {
+        } catch (BadCredentialsException e) {
             throw new Exception("Invalid credentials", e);
         }
     }

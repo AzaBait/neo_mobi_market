@@ -21,6 +21,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     private final JwtTokenUtil jwtTokenUtil;
     private final UserServiceImpl userService;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
@@ -30,11 +31,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         String username = null;
         String jwtToken = null;
 
-        if(header != null && header.startsWith("Bearer ")) {
+        if (header != null && header.startsWith("Bearer ")) {
             jwtToken = header.substring(7);
             try {
                 username = jwtTokenUtil.getUsernameFromToken(jwtToken);
-            }catch (Exception e) {
+            } catch (Exception e) {
                 throw new RuntimeException("Invalid Token");
             }
         }

@@ -19,6 +19,7 @@ public class RegistrationController {
 
     private final UserService userService;
     private final UserMapper userMapper;
+
     @PostMapping("/register")
     public ResponseEntity<String> registerNewUser(@Validated @RequestBody RegisterDto registerDto) {
         userService.save(userMapper.registerDtoToEntity(registerDto));

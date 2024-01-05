@@ -33,6 +33,7 @@ public class JwtTokenUtil {
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
     }
+
     private boolean isTokenExpired(String token) {
         final Date expiration = getExpirationDateFromToken(token);
         return expiration.before(new Date());

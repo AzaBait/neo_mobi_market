@@ -1,7 +1,10 @@
 package com.neobis.mobiMarket.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,12 +25,9 @@ public class Product {
     private String shortDescription;
     private String detailedDescription;
     private double price;
-    @ElementCollection
-    @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
-    @Column(name = "image")
-    private List<String> images = new ArrayList<>();
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Image> images = new ArrayList<>();
     @ManyToOne
- //   @JoinColumn(name = "user_id")
     private User user;
     @ManyToMany
     @JoinTable(

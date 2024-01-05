@@ -7,6 +7,7 @@ import com.neobis.mobiMarket.entity.User;
 import com.neobis.mobiMarket.exception.EmailNotFoundException;
 import com.neobis.mobiMarket.exception.UserNotFoundException;
 import com.neobis.mobiMarket.repository.UserRepo;
+import com.neobis.mobiMarket.service.CloudinaryService;
 import com.neobis.mobiMarket.service.RoleService;
 import com.neobis.mobiMarket.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.management.relation.RoleNotFoundException;
@@ -31,6 +33,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepo userRepo;
     private final RoleService roleService;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final CloudinaryService cloudinaryService;
 
     @Override
     public Optional<User> findByUsername(String username) {
@@ -81,7 +84,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public ResponseEntity<User> update(Long id, UserDto user) {
+    public ResponseEntity<User> update(Long id, UserDto user, MultipartFile file) {
         User userInDB;
         try {
             userInDB = userRepo.findById(id).orElseThrow(()
@@ -93,7 +96,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             userInDB.setPassword(user.getPassword());
             userInDB.setEmail(user.getEmail());
             userInDB.setPhone(user.getPhone());
-            userInDB.setProfileImage(user.getProfileImage());
+
+            if (file != null && !file.isEmpty()) {
+                String profileImageUrl = cloudinaryService.uploadImage(file);
+                userInDB.setProfileImage(profileImageUrl);
+            }
+
 
             userRepo.save(userInDB);
         } catch (Exception e) {
@@ -120,7 +128,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             User user = userOptional.get();
             List<Product> favoriteProducts = user.getFavorites();
             return ResponseEntity.ok(favoriteProducts).getBody();
-        }else {
+        } else {
             throw new UserNotFoundException("User not found with id: " + userId);
         }
 
@@ -130,7 +138,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> user = userRepo.findByUsername(username);
         return user.map(value -> new org.springframework.security.core.userdetails.User(
-                value.getUsername(), value.getPassword(), value.getAuthorities()))
+                        value.getUsername(), value.getPassword(), value.getAuthorities()))
                 .orElseThrow(() -> new UsernameNotFoundException("User with username " + username + " not found!"));
     }
 }

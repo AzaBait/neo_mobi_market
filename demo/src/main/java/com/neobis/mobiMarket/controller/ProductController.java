@@ -15,10 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,16 +28,10 @@ public class ProductController {
     private CloudinaryService cloudinaryService;
     private final ProductMapper productMapper;
     private final Logger logger = LoggerFactory.getLogger(ProductController.class);
-//    @PostMapping("/save")
-//    public ResponseEntity<ProductDto> saveProduct(@RequestBody ProductDto productDto) {
-//        Product product = productService.save(productMapper.dtoToEntity(productDto)).getBody();
-//        ProductDto savedProductDto = productMapper.entityToDto(product);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(savedProductDto);
-//    }
 
     @PostMapping("/save")
     public ResponseEntity<ProductDto> saveProduct(@ModelAttribute ProductDto productDto,
-                                                  @RequestParam ("file")List<MultipartFile> file) {
+                                                  @RequestParam("file") List<MultipartFile> file) {
         try {
             Product product = productMapper.dtoToEntity(productDto);
             ResponseEntity<Product> savedProductResponse = productService.save(product, file);
@@ -51,47 +42,81 @@ public class ProductController {
             logger.error("Error while saving product with images", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .build();
-        }}
+        }
+    }
+
+    @DeleteMapping("/{productId}/images/{publicId}")
+    public ResponseEntity<Product> deleteProductImage(@PathVariable Long productId, @PathVariable String publicId) {
+        try {
+            List<String> publicIds = productService.getProductImagePublicIds(productId);
+
+            if (publicIds.contains(publicId)) {
+                ResponseEntity<Product> response = productService.deleteProductImage(productId, publicId);
+                return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+        } catch (Exception e) {
+            logger.error("Error deleting product image", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+    @GetMapping("/{productId}/image-public-ids")
+    public ResponseEntity<List<String>> getProductImagePublicIds(@PathVariable Long productId) {
+        try {
+            List<String> imagePublicIds = productService.getProductImagePublicIds(productId);
+            return ResponseEntity.ok(imagePublicIds);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
     @GetMapping("user/{userId}")
     public ResponseEntity<List<ProductDto>> getProductsByUserId(@PathVariable Long userId) {
-       try {
-           List<Product> products = productService.getAllByUserId(userId);
+        try {
+            List<Product> products = productService.getAllByUserId(userId);
 
-        if (!products.isEmpty()) {
-            List<ProductDto> productDtos = ProductMapper.INSTANCE.entitiesToDtos(products);
-            return ResponseEntity.ok(productDtos);
-        }else {
-            return ResponseEntity.notFound().build();
+            if (!products.isEmpty()) {
+                List<ProductDto> productDtos = ProductMapper.INSTANCE.entitiesToDtos(products);
+                return ResponseEntity.ok(productDtos);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
         }
-       }catch (EntityNotFoundException e) {
-           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
-       }
     }
+
     @PutMapping("/{id}")
     public ResponseEntity<ProductDto> update(@PathVariable Long id, @RequestBody ProductDto productDto) {
         Product updatedProduct = productService.update(id, productDto).getBody();
         if (updatedProduct != null) {
             ProductDto productDto1 = productMapper.entityToDto(updatedProduct);
             return ResponseEntity.ok(productDto1);
-        }else {
+        } else {
             return ResponseEntity.notFound().build();
         }
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<ProductDto> getById(@PathVariable Long id) {
         return productService.getById(id).map(product -> ResponseEntity.ok(productMapper.entityToDto(product)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
     @GetMapping("/list")
     public ResponseEntity<List<ProductDto>> getAll() {
         List<ProductDto> productDtos = productMapper.entitiesToDtos(productService.getAllProducts());
         return ResponseEntity.ok().body(productDtos);
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProductById(@PathVariable Long id) {
         return productService.deleteProduct(id);
     }
+
     @PostMapping("/{productId}/like")
     public ResponseEntity<String> likeProduct(@PathVariable Long productId, @MemberSubstitution.Current User currentuser) {
         productService.likeProduct(productId, currentuser);
