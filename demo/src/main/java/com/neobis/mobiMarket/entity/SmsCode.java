@@ -9,17 +9,16 @@ import lombok.*;
 @NoArgsConstructor
 @ToString
 @Entity
-@Table(name = "images")
-public class Image {
+@Table(name = "SmsCodes")
+public class SmsCode {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String publicId;
-    private String url;
-
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    private Product product;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @ToString.Exclude
+    private User user;
+    private String code;
+    private String phone;
 
 }

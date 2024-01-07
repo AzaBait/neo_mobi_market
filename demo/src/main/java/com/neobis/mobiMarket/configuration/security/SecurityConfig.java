@@ -59,6 +59,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/product/*/like").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/image/uploadImage").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "api/product/*/image/*").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/smsCode/sendConfirmationCode").permitAll()
                 )
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
