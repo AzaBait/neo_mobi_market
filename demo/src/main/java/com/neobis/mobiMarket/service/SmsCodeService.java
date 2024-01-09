@@ -6,7 +6,6 @@ public interface SmsCodeService {
     String sendConfirmationCodeToPhone(String phoneNumber);
     String generateActivationCode();
     SmsCode save (SmsCode smsCode);
-
-
+    String validateCode(String code);
 
 }

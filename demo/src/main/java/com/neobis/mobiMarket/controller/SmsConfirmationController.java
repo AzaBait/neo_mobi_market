@@ -2,6 +2,7 @@ package com.neobis.mobiMarket.controller;
 
 import com.neobis.mobiMarket.service.SmsCodeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,6 +16,15 @@ public class SmsConfirmationController {
     private final SmsCodeService codeService;
     @PostMapping("/sendConfirmationCode")
     public String sendConfirmationCode(@RequestParam String phoneNumber) {
-        return codeService.sendConfirmationCodeToPhone(phoneNumber);
+        try {
+            return codeService.sendConfirmationCodeToPhone(phoneNumber);
+        }catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+    @PostMapping("/verifyCode")
+    public ResponseEntity<String> confirmCode(@RequestParam String code) {
+        String result = codeService.validateCode(code);
+        return ResponseEntity.ok(result);
     }
 }

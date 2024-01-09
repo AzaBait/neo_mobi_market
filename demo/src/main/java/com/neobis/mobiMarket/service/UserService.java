@@ -17,6 +17,8 @@ public interface UserService {
 
     User save(User user);
 
+    Optional<User> findByPhoneNumber(String phoneNumber);
+
     Optional<User> getById(Long id);
 
     ResponseEntity<User> update(Long id, UserDto user, MultipartFile file);
@@ -26,5 +28,7 @@ public interface UserService {
     ResponseEntity<String> deleteUser(Long id);
 
     List<Product> getFavoriteProducts(Long userId);
+
+    boolean isPhoneNumberVerified(String username);
 
 }

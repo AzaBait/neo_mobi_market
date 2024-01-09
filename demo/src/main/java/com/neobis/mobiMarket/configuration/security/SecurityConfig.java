@@ -50,16 +50,17 @@ public class SecurityConfig {
                                 "/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/user/**",
                                 "/error").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/product/list",
-                                "api/product/**").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "api/user/*").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/api/product/**").permitAll()
-                        .requestMatchers(HttpMethod.DELETE, "/api/product/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/product/list").permitAll()
+                        .requestMatchers(HttpMethod.GET, "api/product/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "api/user/*").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/product/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/product/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/product/save").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/product/*/like").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/image/uploadImage").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/image/uploadImage").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "api/product/*/image/*").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/smsCode/sendConfirmationCode").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/smsCode/verifyCode").permitAll()
                 )
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -78,16 +79,5 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
-//    @Bean
-//    public HttpFirewall getHttpFirewall() {
-//        return new DefaultHttpFirewall();
-//    }
-//@Bean
-//public HttpFirewall getHttpFirewall() {
-//    StrictHttpFirewall strictHttpFirewall = new StrictHttpFirewall();
-//    strictHttpFirewall.setAllowBackSlash(true);
-//    strictHttpFirewall.setAllowUrlEncodedDoubleSlash(true);
-//    strictHttpFirewall.setAllowedHttpMethods(Arrays.asList("GET","POST","DELETE", "OPTIONS"));
-//    return strictHttpFirewall;
-//}
+
 }

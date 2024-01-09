@@ -11,6 +11,7 @@ import com.neobis.mobiMarket.service.CloudinaryService;
 import com.neobis.mobiMarket.service.RoleService;
 import com.neobis.mobiMarket.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,6 +29,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final UserRepo userRepo;
@@ -56,14 +58,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public User save(User user) {
         Optional<User> userWithUsername = userRepo.findByUsername(user.getUsername());
-        Optional<User> userWithEmail = userRepo.findByEmail(user.getEmail());
+        Optional<User> userWithPhone = this.findByPhoneNumber(user.getPhone());
         if (userWithUsername.isPresent()) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "This username " + user.getUsername() + " is already exists!");
         }
-        if (userWithEmail.isPresent()) {
+        if (userWithPhone.isPresent()) {
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "This email " + user.getEmail() + " is already exists!");
+                    HttpStatus.BAD_REQUEST, "This pone number " + user.getPhone() + " is already exists!");
         }
         Role userRole;
         try {
@@ -76,6 +78,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepo.save(user);
         return user;
+    }
+
+    @Override
+    public Optional<User> findByPhoneNumber(String phoneNumber) {
+        try {
+            return Optional.ofNullable(userRepo.findByPhone(phoneNumber));
+        } catch (Exception e) {
+            // Логирование ошибки или обработка по вашему усмотрению
+            log.error("Error during user retrieval by phone number: {}", e.getMessage());
+            throw new RuntimeException("Error during user retrieval by phone number", e);
+        }
     }
 
     @Override
@@ -132,6 +145,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new UserNotFoundException("User not found with id: " + userId);
         }
 
+    }
+
+    @Override
+    public boolean isPhoneNumberVerified(String username) {
+        Optional<User> optionalUser = userRepo.findByUsername(username);
+        return optionalUser.map(User::isEnabled).orElse(false);
     }
 
     @Override

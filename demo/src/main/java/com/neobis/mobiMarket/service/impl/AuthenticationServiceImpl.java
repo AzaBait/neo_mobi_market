@@ -2,6 +2,7 @@ package com.neobis.mobiMarket.service.impl;
 
 import com.neobis.mobiMarket.configuration.security.jwt.JwtTokenUtil;
 import com.neobis.mobiMarket.dto.JwtRequest;
+import com.neobis.mobiMarket.repository.UserRepo;
 import com.neobis.mobiMarket.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,12 +19,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JwtTokenUtil jwtTokenUtil;
     private final AuthenticationManager authenticationManager;
     private final UserServiceImpl userService;
+    private final UserRepo userRepo;
 
     @Override
     public String authenticateAndGetToken(JwtRequest jwtRequest) {
         try {
             authenticate(jwtRequest.getUsername(), jwtRequest.getPassword());
             final UserDetails userDetails = userService.loadUserByUsername(jwtRequest.getUsername());
+            if (!userService.isPhoneNumberVerified(jwtRequest.getUsername())){
+                throw new RuntimeException("Please verify your account to enable!");
+            }
             return jwtTokenUtil.generateToken(userDetails);
         } catch (Exception e) {
             throw new RuntimeException(e);
