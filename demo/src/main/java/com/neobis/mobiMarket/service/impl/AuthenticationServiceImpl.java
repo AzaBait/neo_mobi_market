@@ -26,7 +26,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         try {
             authenticate(jwtRequest.getUsername(), jwtRequest.getPassword());
             final UserDetails userDetails = userService.loadUserByUsername(jwtRequest.getUsername());
-            if (!userService.isPhoneNumberVerified(jwtRequest.getUsername())){
+            if (!userService.isEmailVerified(jwtRequest.getUsername())){
                 throw new RuntimeException("Please verify your account to enable!");
             }
             return jwtTokenUtil.generateToken(userDetails);

@@ -29,6 +29,8 @@ public interface UserService {
 
     List<Product> getFavoriteProducts(Long userId);
 
-    boolean isPhoneNumberVerified(String username);
+    boolean isEmailVerified(String username);
+    void updateUserStatus(User user);
+
 
 }

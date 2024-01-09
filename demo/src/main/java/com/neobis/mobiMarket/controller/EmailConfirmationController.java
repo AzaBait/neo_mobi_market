@@ -1,6 +1,7 @@
 package com.neobis.mobiMarket.controller;
 
-import com.neobis.mobiMarket.service.SmsCodeService;
+import com.neobis.mobiMarket.service.ActivationCodeService;
+import com.neobis.mobiMarket.service.impl.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,14 +11,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/smsCode")
-public class SmsConfirmationController {
+@RequestMapping("/api/email")
+public class EmailConfirmationController {
 
-    private final SmsCodeService codeService;
+    private final ActivationCodeService codeService;
+    private final EmailService emailService;
     @PostMapping("/sendConfirmationCode")
-    public String sendConfirmationCode(@RequestParam String phoneNumber) {
+    public String sendConfirmationCode(@RequestParam String email) {
         try {
-            return codeService.sendConfirmationCodeToPhone(phoneNumber);
+            return emailService.sendActivationEmail(email);
         }catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }

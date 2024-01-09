@@ -11,8 +11,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "SmsCodes")
-public class SmsCode {
+@Table(name = "activationCodes")
+public class ActivationCode {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,7 +20,7 @@ public class SmsCode {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
     private String code;
-    private String phone;
+    private String email;
 
     @Override
     public String toString() {
@@ -28,7 +28,7 @@ public class SmsCode {
                 "id=" + id +
                 ", user=" + user +
                 ", code='" + code + '\'' +
-                ", phone='" + phone + '\'' +
+                ", phone='" + email + '\'' +
                 '}';
     }
 }

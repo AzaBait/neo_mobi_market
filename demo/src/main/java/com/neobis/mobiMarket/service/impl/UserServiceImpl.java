@@ -58,14 +58,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public User save(User user) {
         Optional<User> userWithUsername = userRepo.findByUsername(user.getUsername());
-        Optional<User> userWithPhone = this.findByPhoneNumber(user.getPhone());
+        Optional<User> userWithEmail = userRepo.findByEmail(user.getEmail());
         if (userWithUsername.isPresent()) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST, "This username " + user.getUsername() + " is already exists!");
         }
-        if (userWithPhone.isPresent()) {
+        if (userWithEmail.isPresent()) {
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "This pone number " + user.getPhone() + " is already exists!");
+                    HttpStatus.BAD_REQUEST, "This email " + user.getEmail() + " is already exists!");
         }
         Role userRole;
         try {
@@ -76,7 +76,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
         user.setRoles(Collections.singleton(userRole));
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        log.info("Before saving user : {} ", user);
         userRepo.save(user);
+        log.info("After saving user : {} ", user);
         return user;
     }
 
@@ -85,7 +87,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         try {
             return Optional.ofNullable(userRepo.findByPhone(phoneNumber));
         } catch (Exception e) {
-            // Логирование ошибки или обработка по вашему усмотрению
             log.error("Error during user retrieval by phone number: {}", e.getMessage());
             throw new RuntimeException("Error during user retrieval by phone number", e);
         }
@@ -93,7 +94,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public Optional<User> getById(Long id) {
-        return Optional.empty();
+        return userRepo.findById(id);
     }
 
     @Override
@@ -146,9 +147,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
 
     }
+    @Override
+    public void updateUserStatus(User user) {
+        user.setEnabled(true);
+        userRepo.save(user);
+    }
 
     @Override
-    public boolean isPhoneNumberVerified(String username) {
+    public boolean isEmailVerified(String username) {
         Optional<User> optionalUser = userRepo.findByUsername(username);
         return optionalUser.map(User::isEnabled).orElse(false);
     }
