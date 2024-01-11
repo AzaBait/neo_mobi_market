@@ -7,5 +7,5 @@ public class JwtRequest {
 
     private final String username;
     private final String password;
-    private final String email;
+
 }
