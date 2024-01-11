@@ -22,8 +22,7 @@ public class EmailService {
 
     public String sendActivationEmail(String toEmail) {
         Optional<User> userOptional = userRepo.findByEmail(toEmail);
-        String  activationCode = activationCodeService.generateActivationCode();
-        sendCode(toEmail, activationCode);
+        String  activationCode = activationCodeService.generateActivationCode();;
         if (userOptional.isPresent()) {
             ActivationCode code = new ActivationCode();
             code.setEmail(toEmail);
@@ -31,14 +30,12 @@ public class EmailService {
             code.setUser(userOptional.get());
             activationCodeService.save(code);
         }
-        return "Activation code send successfully!";
-    }
-        public void sendCode(String toEmail, String activationCode) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(toEmail);
         message.setSubject("Activate your account");
         message.setText("Your activation code below:\n\n" + activationCode);
         javaMailSender.send(message);
-            }
+        return "Activation code send successfully!";
+    }
 
 }
