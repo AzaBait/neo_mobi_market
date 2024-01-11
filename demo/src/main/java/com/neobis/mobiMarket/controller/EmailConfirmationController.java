@@ -1,6 +1,7 @@
 package com.neobis.mobiMarket.controller;
 
 import com.neobis.mobiMarket.service.ActivationCodeService;
+import com.neobis.mobiMarket.service.UserService;
 import com.neobis.mobiMarket.service.impl.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,11 +17,22 @@ public class EmailConfirmationController {
 
     private final ActivationCodeService codeService;
     private final EmailService emailService;
+    private final UserService userService;
+//    @PostMapping("/sendConfirmationCode")
+//    public String sendConfirmationCode(@RequestParam String email,@RequestParam String username) {
+//        try {
+//            return emailService.sendActivationEmail(email, username);
+//        }catch (Exception e) {
+//            throw new RuntimeException(e.getMessage());
+//        }
+//    }
+
     @PostMapping("/sendConfirmationCode")
-    public String sendConfirmationCode(@RequestParam String email,@RequestParam String username) {
+    public String sendConfirmationCode(@RequestParam String email) {
         try {
-            return emailService.sendActivationEmail(email, username);
-        }catch (Exception e) {
+            userService.authenticateUser(email); // Ваш метод аутентификации пользователя
+            return emailService.sendActivationEmail(email);
+        } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
     }

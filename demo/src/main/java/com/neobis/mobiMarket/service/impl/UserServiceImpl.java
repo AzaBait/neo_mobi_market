@@ -14,6 +14,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -36,6 +39,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final RoleService roleService;
     private final BCryptPasswordEncoder passwordEncoder;
     private final CloudinaryService cloudinaryService;
+    private final AuthenticationManager authenticationManager;
+    @Override
+    public void authenticateUser(String email) {
+        // Ваша логика получения UserDetails, например, из базы данных
+        UserDetails userDetails = loadUserByUsername(email);
+
+        // Аутентификация пользователя
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        authenticationManager.authenticate(authentication);
+    }
 
     @Override
     public Optional<User> findByUsername(String username) {

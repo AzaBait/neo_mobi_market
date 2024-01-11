@@ -32,5 +32,7 @@ public interface UserService {
     boolean isEmailVerified(String username);
     void updateUserStatus(User user);
 
+    void authenticateUser(String email);
+
 
 }
