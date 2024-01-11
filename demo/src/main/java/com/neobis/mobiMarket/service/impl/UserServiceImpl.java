@@ -39,16 +39,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final RoleService roleService;
     private final BCryptPasswordEncoder passwordEncoder;
     private final CloudinaryService cloudinaryService;
-    private final AuthenticationManager authenticationManager;
-    @Override
-    public void authenticateUser(String email) {
-        // Ваша логика получения UserDetails, например, из базы данных
-        UserDetails userDetails = loadUserByUsername(email);
-
-        // Аутентификация пользователя
-        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-        authenticationManager.authenticate(authentication);
-    }
 
     @Override
     public Optional<User> findByUsername(String username) {

@@ -19,9 +19,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JwtTokenUtil jwtTokenUtil;
     private final AuthenticationManager authenticationManager;
     private final UserServiceImpl userService;
-    private final UserRepo userRepo;
-
-    @Override
+     @Override
     public String authenticateAndGetToken(JwtRequest jwtRequest) {
         try {
             authenticate(jwtRequest.getUsername(), jwtRequest.getPassword());
