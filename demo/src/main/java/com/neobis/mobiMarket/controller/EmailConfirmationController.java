@@ -17,9 +17,9 @@ public class EmailConfirmationController {
     private final ActivationCodeService codeService;
     private final EmailService emailService;
     @PostMapping("/sendConfirmationCode")
-    public String sendConfirmationCode(@RequestParam String email) {
+    public String sendConfirmationCode(@RequestParam String email, String username) {
         try {
-            return emailService.sendActivationEmail(email);
+            return emailService.sendActivationEmail(email, username);
         }catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }

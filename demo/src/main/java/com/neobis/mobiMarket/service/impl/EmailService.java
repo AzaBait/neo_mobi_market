@@ -20,7 +20,7 @@ public class EmailService {
     private final UserRepo userRepo;
     private final ActivationCodeService activationCodeService;
 
-    public String sendActivationEmail(String toEmail) {
+    public String sendActivationEmail(String toEmail, String username) {
         Optional<User> userOptional = userRepo.findByEmail(toEmail);
         String  activationCode = activationCodeService.generateActivationCode();;
         if (userOptional.isPresent()) {
