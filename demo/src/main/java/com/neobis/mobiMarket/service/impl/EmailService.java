@@ -2,39 +2,47 @@ package com.neobis.mobiMarket.service.impl;
 
 import com.neobis.mobiMarket.entity.ActivationCode;
 import com.neobis.mobiMarket.entity.User;
-import com.neobis.mobiMarket.repository.UserRepo;
 import com.neobis.mobiMarket.service.ActivationCodeService;
 import com.neobis.mobiMarket.service.UserService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+
+@Setter
+@Getter
+@Slf4j
 @Service
 public class EmailService {
 
-
+    @Autowired
     private  JavaMailSender javaMailSender;
-    private  UserRepo userRepo;
+    @Autowired
     private  ActivationCodeService activationCodeService;
+    @Autowired
+    private UserService userService;
 
-    public EmailService(JavaMailSender javaMailSender, UserRepo userRepo, ActivationCodeService activationCodeService) {
+    public EmailService(JavaMailSender javaMailSender, UserService userService, ActivationCodeService activationCodeService) {
         this.javaMailSender = javaMailSender;
-        this.userRepo = userRepo;
+        this.userService = userService;
         this.activationCodeService = activationCodeService;
+        log.info("lsjkcklcwlvbuweib");
     }
 
     public EmailService() {
     }
 
     public String sendActivationEmail(String toEmail) {
-        Optional<User> userOptional = userRepo.findByEmail(toEmail);
+        Optional<User> userOptional = userService.findByEmail(toEmail);
         String  activationCode = activationCodeService.generateActivationCode();;
         if (userOptional.isPresent()) {
             ActivationCode code = new ActivationCode();

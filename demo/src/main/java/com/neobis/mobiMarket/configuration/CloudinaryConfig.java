@@ -2,13 +2,20 @@ package com.neobis.mobiMarket.configuration;
 
 
 import com.cloudinary.Cloudinary;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.HashMap;
 import java.util.Map;
-
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 @Configuration
 public class CloudinaryConfig {
 

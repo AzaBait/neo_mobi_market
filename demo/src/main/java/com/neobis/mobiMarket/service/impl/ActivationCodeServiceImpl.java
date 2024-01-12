@@ -13,9 +13,10 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 
-@Service
+
 @Slf4j
 @RequiredArgsConstructor
+@Service
 public class ActivationCodeServiceImpl implements ActivationCodeService {
 
     private final ActivationCodeRepo activationCodeRepo;

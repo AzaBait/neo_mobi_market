@@ -10,13 +10,12 @@ import com.neobis.mobiMarket.repository.UserRepo;
 import com.neobis.mobiMarket.service.CloudinaryService;
 import com.neobis.mobiMarket.service.RoleService;
 import com.neobis.mobiMarket.service.UserService;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -31,14 +30,28 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
+//@AllArgsConstructor
+//@NoArgsConstructor
 @Slf4j
 public class UserServiceImpl implements UserService, UserDetailsService {
+    @Autowired
+    private  UserRepo userRepo;
+    @Autowired
+    private  RoleService roleService;
+    @Autowired
+    private  BCryptPasswordEncoder passwordEncoder;
+    @Autowired
+    private  CloudinaryService cloudinaryService;
 
-    private final UserRepo userRepo;
-    private final RoleService roleService;
-    private final BCryptPasswordEncoder passwordEncoder;
-    private final CloudinaryService cloudinaryService;
+    public UserServiceImpl(UserRepo userRepo, RoleService roleService, BCryptPasswordEncoder passwordEncoder, CloudinaryService cloudinaryService) {
+        this.userRepo = userRepo;
+        this.roleService = roleService;
+        this.passwordEncoder = passwordEncoder;
+        this.cloudinaryService = cloudinaryService;
+    }
+
+    public UserServiceImpl() {
+    }
 
     @Override
     public Optional<User> findByUsername(String username) {
