@@ -20,14 +20,17 @@ import java.util.Optional;
 public class EmailService {
 
 
-    private final JavaMailSender javaMailSender;
-    private final UserRepo userRepo;
-    private final ActivationCodeService activationCodeService;
+    private  JavaMailSender javaMailSender;
+    private  UserRepo userRepo;
+    private  ActivationCodeService activationCodeService;
 
     public EmailService(JavaMailSender javaMailSender, UserRepo userRepo, ActivationCodeService activationCodeService) {
         this.javaMailSender = javaMailSender;
         this.userRepo = userRepo;
         this.activationCodeService = activationCodeService;
+    }
+
+    public EmailService() {
     }
 
     public String sendActivationEmail(String toEmail) {
