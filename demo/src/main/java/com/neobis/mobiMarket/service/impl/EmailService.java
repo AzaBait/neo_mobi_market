@@ -17,13 +17,18 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
 public class EmailService {
 
 
     private final JavaMailSender javaMailSender;
     private final UserRepo userRepo;
     private final ActivationCodeService activationCodeService;
+
+    public EmailService(JavaMailSender javaMailSender, UserRepo userRepo, ActivationCodeService activationCodeService) {
+        this.javaMailSender = javaMailSender;
+        this.userRepo = userRepo;
+        this.activationCodeService = activationCodeService;
+    }
 
     public String sendActivationEmail(String toEmail) {
         Optional<User> userOptional = userRepo.findByEmail(toEmail);
