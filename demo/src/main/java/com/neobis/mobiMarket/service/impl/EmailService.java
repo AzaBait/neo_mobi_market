@@ -16,7 +16,7 @@ import java.util.Optional;
 @Service
 @AllArgsConstructor
 public class EmailService {
-    @Value("")
+    @Value("{gmail_username}")
     private String from;
 
     private final JavaMailSender javaMailSender;
@@ -34,7 +34,7 @@ public class EmailService {
             activationCodeService.save(code);
         }
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("{gmail_username}");
+        message.setFrom(from);
         message.setTo(toEmail);
         message.setSubject("Activate your account");
         message.setText("Your activation code below:\n\n" + activationCode);
